@@ -1,0 +1,154 @@
+
+import pandas as pd
+import numpy as np
+import random
+from datetime import timedelta, datetime
+from shapely.geometry import Point
+from collections import defaultdict
+
+# Seed für Reproduzierbare Ergebnisse
+random.seed(42)
+np.random.seed(42)
+
+# Parameter
+num_people = 1000
+min_trips_per_person = 2
+max_trips_per_person = 8
+
+# Beispielwerte für Demografie
+ages = np.random.randint(18, 80, size=num_people)
+genders = np.random.choice(['männlich', 'weiblich', 'divers'], size=num_people, p=[0.48, 0.48, 0.04])
+occupations = ['Schüler*in', 'Student*in', 'Angestellt', 'Selbstständig', 'Rentner*in', 'Arbeitslos']
+households = ['alleinlebend', 'Paar ohne Kinder', 'Familie mit Kindern', 'Wohngemeinschaft']
+districts = ['Innenstadt', 'Durlach', 'Knielingen', 'Mühlburg', 'Oststadt', 'Südweststadt', 'Neureut', 'Grünwinkel']
+
+locations = [
+    'KIT Campus Süd', 'Marktplatz', 'Hbf', 'Europabad', 'ZKM', 'Schloss Karlsruhe',
+    'Durlach Zentrum', 'Wildparkstadion', 'Rheinhafen', 'Siemensallee', 'Waldstadt Zentrum',
+    'Städtisches Klinikum', 'FH Karlsruhe', 'Rüppurrer Straße', 'Weststadt', 'Hagsfeld',
+    'Botanischer Garten', 'Turmberg', 'Günther-Klotz-Anlage', 'Naturkundemuseum Karlsruhe',
+    'Staatliche Kunsthalle Karlsruhe', 'Schloss Gottesaue', 'Alter Schlachthof', 'Majolika Manufaktur',
+    'Stadtgarten', 'Schlossplatz', 'Friedrichsplatz', 'Ludwigsplatz', 'Kaiserstraße', 'Karlstraße',
+    'Erbprinzenstraße', 'Kriegsstraße', 'Moltkestraße', 'Durlacher Allee', 'Rüppurrer Straße',
+    'Herrenstraße', 'Waldstraße', 'Sophienstraße', 'Kanalweg', 'Haid-und-Neu-Straße',
+    'Blumenstraße', 'Gartenstraße', 'Bismarckstraße', 'Kaiserallee', 'Rheinstrandsiedlung',
+    'Neureuter Hauptstraße', 'Knielinger Allee', 'Grötzinger Straße', 'Karlsbader Straße',
+    'Ettlinger Allee', 'Hauptfriedhof', 'Alter Flugplatz', 'Schlossgarten', 'Fasanengarten',
+    'Hofgarten', 'Oberwald', 'Tierpark Oberwald', 'Rheinpark', 'Citypark', 'Südweststadt',
+    'Südstadt', 'Nordstadt', 'Oststadt', 'Mühlburg', 'Daxlanden', 'Grünwinkel', 'Beiertheim-Bulach',
+    'Weiherfeld-Dammerstock', 'Rüppurr', 'Oberreut', 'Grötzingen', 'Hohenwettersbach', 'Wolfartsweier',
+    'Grünwettersbach', 'Palmbach', 'Stupferich', 'Neureut', 'Nordweststadt', 'Rintheim', 'Rheinhafen',
+    'Alter Schlachthof', 'Kreativpark Alter Schlachthof', 'Filmpalast am ZKM', 'Europahalle',
+    'Stadthalle Karlsruhe', 'Badisches Staatstheater', 'Kammertheater Karlsruhe', 'Sandkorn Theater',
+    'Jakobus-Theater', 'Marotte Figurentheater', 'Badische Landesbibliothek', 'Amerikahaus',
+    'Bundesverfassungsgericht', 'Bundesgerichtshof', 'Generalbundesanwalt', 'Landesbibliothek',
+    'Ständehaus', 'Prinz-Max-Palais', 'Stadtmuseum Karlsruhe', 'Pyramide am Marktplatz',
+    'Evangelische Stadtkirche', 'St. Stephan Kirche', 'Kleine Kirche', 'Christuskirche',
+    'St. Bernhard Kirche', 'St. Elisabeth Kirche', 'St. Konrad Kirche', 'St. Peter und Paul Kirche',
+    'St. Michael Kirche']
+
+purposes = ['Arbeit', 'Einkaufen', 'Freizeit', 'Schule/Uni', 'Begleitung', 'Erholung', 'Sport', 'Arztbesuch']
+modes = ['Auto', 'Fahrrad', 'ÖPNV', 'zu Fuß', 'E-Scooter', 'multimodal']
+
+# Dauer nach Zweck
+def purpose_duration(purpose):
+    if purpose in ['Arbeit', 'Schule/Uni']:
+        return random.randint(240, 540)
+    elif purpose in ['Einkaufen', 'Arztbesuch']:
+        return random.randint(30, 90)
+    elif purpose in ['Freizeit', 'Sport', 'Erholung']:
+        return random.randint(60, 180)
+    elif purpose == 'Begleitung':
+        return random.randint(10, 30)
+    else:
+        return random.randint(30, 120)
+
+# Distanzschätzung
+def estimate_distance(loc1, loc2):
+    base = random.uniform(0.5, 2.0)
+    if loc1 == loc2:
+        return round(base, 1)
+    return round(base + random.uniform(1.5, 6.0), 1)
+
+# Ergebnisse sammeln
+rows = []
+
+# Erstellung des Wegetagebuchs
+for person_id in range(1, num_people + 1):
+    age = ages[person_id - 1]
+    gender = genders[person_id - 1]
+    occupation = random.choice(occupations)
+    household = random.choice(households)
+    district = random.choice(districts)
+
+    num_trips = random.randint(min_trips_per_person, max_trips_per_person)
+    trip_locations = random.sample(locations, k=num_trips + 1)
+    current_time = datetime.strptime("05:30", "%H:%M") + timedelta(minutes=random.randint(0, 90))
+
+    person_trips = []
+
+    for trip_index in range(num_trips):
+        start_time = current_time
+        travel_duration = timedelta(minutes=random.randint(10, 45))
+        end_time = start_time + travel_duration
+        activity_duration = timedelta(minutes=purpose_duration(random.choice(purposes)))
+        current_time = end_time + activity_duration
+
+        start_location = trip_locations[trip_index]
+        end_location = trip_locations[trip_index + 1]
+        purpose = random.choice(purposes)
+        mode = random.choice(modes)
+        distance = estimate_distance(start_location, end_location)
+        multimodal = 'ja' if mode == 'multimodal' else 'nein'
+
+        person_trips.append({
+            'PersonenID': person_id,
+            'Alter': age,
+            'Geschlecht': gender,
+            'Beruf': occupation,
+            'Haushaltstyp': household,
+            'Wohnviertel': district,
+            'Startzeit': start_time.strftime('%H:%M'),
+            'Endzeit': end_time.strftime('%H:%M'),
+            'Startort': start_location,
+            'Zielort': end_location,
+            'Zweck': purpose,
+            'Entfernung_km': distance,
+            'Verkehrsmittel': mode,
+            'Multimodal': multimodal
+        })
+
+    # Heimweg hinzufügen
+    if person_trips[-1]['Zielort'] != person_trips[0]['Startort']:
+        start_location = person_trips[-1]['Zielort']
+        end_location = person_trips[0]['Startort']
+        travel_duration = timedelta(minutes=random.randint(10, 45))
+        start_time = current_time
+        end_time = start_time + travel_duration
+        mode = random.choice(modes)
+        multimodal = 'ja' if mode == 'multimodal' else 'nein'
+        distance = estimate_distance(start_location, end_location)
+
+        person_trips.append({
+            'PersonenID': person_id,
+            'Alter': age,
+            'Geschlecht': gender,
+            'Beruf': occupation,
+            'Haushaltstyp': household,
+            'Wohnviertel': district,
+            'Startzeit': start_time.strftime('%H:%M'),
+            'Endzeit': end_time.strftime('%H:%M'),
+            'Startort': start_location,
+            'Zielort': end_location,
+            'Zweck': 'Heimweg',
+            'Entfernung_km': distance,
+            'Verkehrsmittel': mode,
+            'Multimodal': multimodal
+        })
+
+    rows.extend(person_trips)
+
+# Als DataFrame
+df_final = pd.DataFrame(rows)
+csv_path = r"wegetagebuch_karlsruhe.csv"
+df_final.to_csv(csv_path, index=False)

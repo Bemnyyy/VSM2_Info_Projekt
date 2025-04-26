@@ -1,0 +1,53 @@
+
+
+🎯 Ziel der Aufgabe:
+Analysiert anhand des synthetischen Wegetagebuchs, wie sich die Alltagsmobilität zwischen verschiedenen Stadtteilen Karlsruhes verteilt.
+Ermittelt typische Pendelströme, erkennt überlastete Relationen und entwickelt Optimierungsideen für den Stadtverkehr – z. B. durch gezielte Infrastrukturmaßnahmen, Verkehrsverlagerung oder Angebotsausbau.
+
+🔍 Teil 1: Datenaufbereitung
+1. Georeferenzierung sicherstellen
+   - Start- und Zielorte sind mit Koordinaten versehen ergänzen.
+2. Zuordnung zu Stadtteilen
+   - Nutzt eine Stadtteil-Shapefile (z.B. OSM).
+3. Verkehrsflüsse aggregieren
+   - Zählt Wege zwischen Stadtteilen (Start → Ziel).
+   - Gruppiert zusätzlich nach Verkehrsmittel oder Zweck.
+
+📊 Teil 2: Visualisierung
+1. Chord-Diagramm oder Heatmap zur Darstellung der Verkehrsbeziehungen.
+2. Kartenbasierte Darstellung:
+   - Linienpfeile für stark frequentierte Relationen
+   - Heatmaps nach Ziel-/Starthäufigkeit je Stadtteil
+3. Optional: Interaktive Karte (z.B. mit Folium, Plotly, Kepler.gl)
+
+🧠 Teil 3: Interpretation & Maßnahmen
+Analysiert:
+- Welche Stadtteile erzeugen/verursachen viel Verkehr?
+- Welche Zielorte ziehen besonders stark an?
+- Wie verteilt sich der Verkehrsmittelmix?
+- Welche Verbindungen sind überlastet?
+Erarbeitet konkrete Verbesserungsmaßnahmen:
+- z.B. neue ÖPNV-Verbindungen, Fahrradachsen, Mobility-Hubs
+
+💡 Bonusideen:
+- Analyse nach Tageszeit (Berufsverkehr etc.)
+- Zweckdifferenzierung (Arbeit, Freizeit ...)
+- Visualisierung Modalsplit nach Relation
+
+🛠 Tools & Tipps:
+- GeoPandas, Pandas, Matplotlib, Folium, Plotly
+- Stadtteil-Shapefile z.B. von OSM
+
+📦 Abgabeformate:
+- Python-Skript / Jupyter Notebook
+- 1–2 Karten + Ergebnisgrafiken
+- Tabelle der wichtigsten Relationen
+- Kurzbericht (max. 5 Seiten)
+- 5 Minuten Pitch
+
+✅ Bewertungskriterien:
+- Datenaufbereitung & Stadtteil-Zuordnung: 20 Punkte
+- Qualität & Tiefe der Analyse: 25 Punkte
+- Visualisierung & Verständlichkeit: 20 Punkte
+- Qualität der Empfehlungen: 25 Punkte
+- Dokumentation & Argumentation: 10 Punkte
