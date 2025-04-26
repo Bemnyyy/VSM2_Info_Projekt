@@ -24,19 +24,21 @@ gdf_districts = gpd.read_file(...).to_crs(epsg=4326)
 gdf_joined = gpd.sjoin(...)
 gdf_joined['Ziel_Stadtteil'] = ...
 ```
-	Die Punkte werden mit GeoPandas dem jeweiligen Stadtteil zugeordnet (sog. Spatial Join)
+-> Die Punkte werden mit GeoPandas dem jeweiligen Stadtteil zugeordnet (sog. Spatial Join)
+
 2.	Aggregation 
 Verkehrsflüsse:
 ```python
 Verkehrsluesse = gdf_joined.groupby(['Start_Stadtteil', 'Ziel_Stadtteil']).size()
 ```
-	Zählt alle Wege zwischen zwei Stadtteilen.
+-> Zählt alle Wege zwischen zwei Stadtteilen.
 Verkehrsmittel & Zweck:
 ```python
 verkehrsfluesse_modalsplit = gdf_joined.groupby([...])
 verkehrsfluesse_zweck = gdf_joined.groupby([...])
 ```
-	 Zeigt Modalsplit und Zweckverteilung pro Relation.
+-> Zeigt Modalsplit und Zweckverteilung pro Relation.
+
 3.	Visualisierungen
 Heatmap (interaktiv)
 ```python
@@ -48,10 +50,10 @@ karte = folium.Map(...)
 PolyLine(...)  # Top 10 Verbindungen
 HeatMap(...)   # Start- und Zielorte
 ```
-	Darstellung von Verbindungsdichte und Richtung.
+->	Darstellung von Verbindungsdichte und Richtung.
 Modalsplit – Gestapelte Balken
 ```python
 modalsplit_df = df.groupby([...]).size()
 pivot_table → normiert → bar plot (gestapelt)
 ```
-	Prozentualer Anteil je Verkehrsmittel pro Verbindung.
+->	Prozentualer Anteil je Verkehrsmittel pro Verbindung.
