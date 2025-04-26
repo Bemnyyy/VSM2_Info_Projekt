@@ -8,8 +8,8 @@ from folium.plugins import HeatMap
 import matplotlib.pyplot as plt
 
 # Pfade
-CSV_PATH = "/workspaces/VSM2_Info_Projekt/wegetagebuch_karlsruhe_geocoded.csv"
-SHAPEFILE_PATH = "/workspaces/VSM2_Info_Projekt/Stadtteile_SHP/Stadtteile_Karlsruhe.shp"
+CSV_PATH = "BITTE ANPASSEN AN LOKALE DATEI"
+SHAPEFILE_PATH = "BITTE ANPASSEN AN LOKALE DATEI"
 
 # CSV mit Koordinaten laden
 df = pd.read_csv(CSV_PATH)
