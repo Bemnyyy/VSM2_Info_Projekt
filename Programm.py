@@ -8,7 +8,7 @@ from folium.plugins import HeatMap
 import matplotlib.pyplot as plt
 
 # Pfade
-CSV_PATH = "BITTE ANPASSEN AN LOKALE PFADE"
+CSV_PATH = "BITTE ANPASSEN AN LOKALE PFADE (BITTE DIE GEOCODED DATEI VERWENDEN)"
 SHAPEFILE_PATH = "BITTE ANPASSEN AN LOKALE PFADE"
 
 # CSV mit Koordinaten laden
@@ -50,7 +50,6 @@ gdf_joined["Ziel_Stadtteil"] = gdf_joined_ziel[district_col]
 #Ergebnisse werden gespeichert
 gdf_joined.drop(columns="geometry", inplace=True)
 gdf_joined.to_csv("wegetagebuch_mit_stadtteilen.csv", index=False)
-
 
 
 '''Aggregation der VERKEHRSFLÜSSE'''
@@ -100,7 +99,6 @@ fig = px.density_heatmap(
     title="Verkehrsflüsse zwischen den Stadtteilen (interaktive Heatmap)")
 fig.update_layout(xaxis_tickangle=-45)
 fig.show()
-
 
 #Top-N Verbindungen berechnen
 top_n = 10
