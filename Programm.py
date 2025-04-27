@@ -13,6 +13,7 @@ SHAPEFILE_PATH = "BITTE ANPASSEN AN LOKALE PFADE"
 
 # CSV mit Koordinaten laden
 df = pd.read_csv(CSV_PATH)
+#OPTIONAL: Überblick der Spalten der CSV-Datei
 print(df.columns)
 
 #Wandelt Startorte in GeoPoints um --> für räumliche Verarbeitung
@@ -26,7 +27,7 @@ gdf_start = gpd.GeoDataFrame(
 gdf_districts = gpd.read_file(SHAPEFILE_PATH)
 gdf_districts = gdf_districts.to_crs(epsg=4326)
 
-#OPTIONAL: Überblick über Spalten
+#OPTIONAL: Überblick über Spalten der Shapefiledatei
 print(gdf_districts.columns)
 
 #Spalte mit Stadtteilnamen
